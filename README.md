@@ -6,5 +6,6 @@
 $ python3 -m venv venv
 $ . venv/bin/activate
 $  pip install pandas
+$  pip install openpyxl
 ```# TutorReporting
 # TutorReporting
