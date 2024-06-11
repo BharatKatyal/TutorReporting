@@ -3,9 +3,8 @@
 
 
 .DS_Store
-
 # Ignore venv files
-./venv
+venv/
 
 # Ignore compiled binaries
 *.exe
