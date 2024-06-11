@@ -22,12 +22,6 @@ def calculate_performance(student_row, skill_tags, answer_key):
             performance[skill]['correct'] += 1
         performance[skill]['total'] += 1
     
-    # Convert counts to percentages
-    for skill in performance:
-        correct = performance[skill]['correct']
-        total = performance[skill]['total']
-        performance[skill]['percentage'] = (correct / total) * 100 if total > 0 else 0
-    
     return performance
 
 # Prepare a list to store each student's report data
@@ -36,20 +30,26 @@ report_data = []
 # Iterate through each student and calculate their performance
 for idx, row in student_data.iterrows():
     email = row['Email Address']
+    submission_date = row['Timestamp']  # Add submission date
     student_performance = calculate_performance(row, skill_tags, answer_key)
     
     # Prepare the student's report data
-    student_report = {'Student': email}
+    student_report = {'Student': email, 'Submission_Date': submission_date}
     for skill in skill_tags:
-        student_report[skill] = f"{student_performance[skill]['percentage']:.2f}%"
+        correct = student_performance[skill]['correct']
+        total = student_performance[skill]['total']
+        student_report[skill] = f"{correct}/{total}"
     
     report_data.append(student_report)
 
 # Create a DataFrame from the report data
 report_df = pd.DataFrame(report_data)
 
-# Save the DataFrame to a CSV file
-report_file_path = './all_students_performance_report.csv'
-report_df.to_csv(report_file_path, index=False)
+# Ensure all data is treated as text
+report_df = report_df.astype(str)
+
+# Save the DataFrame to an Excel file
+report_file_path = './all_students_performance_report.xlsx'
+report_df.to_excel(report_file_path, index=False)
 
 report_file_path
