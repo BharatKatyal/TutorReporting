@@ -24,3 +24,7 @@ venv/
 # Ignore temporary files
 *.tmp
 *.bak
+
+
+# Ignore AWS SAM files
+**/.aws-sam/
