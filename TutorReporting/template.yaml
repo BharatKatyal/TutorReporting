@@ -4,7 +4,6 @@ Description: |
   TutorReporting
   Sample SAM Template for TutorReporting
 
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
     Timeout: 30
@@ -13,6 +12,13 @@ Globals:
     # You can add LoggingConfig parameters such as the Logformat, Log Group, and SystemLogLevel or ApplicationLogLevel. Learn more here https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-resource-function.html#sam-function-loggingconfig.
     LoggingConfig:
       LogFormat: JSON
+
+  Api:
+    Cors:
+      AllowMethods: '''POST'''
+      AllowHeaders: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'''
+      AllowOrigin: '''*''' # Replace with your domain in production
+# ... rest of the template remains unchanged
 Resources:
 
   GenerateReportFunction:
@@ -53,6 +59,13 @@ Resources:
               Resource:
                 - !Sub arn:${AWS::Partition}:s3:::${GenerateReportBucket}
                 - !Sub arn:${AWS::Partition}:s3:::${GenerateReportBucket}/*
+      Events:
+        ApiGateway:
+          Type: Api
+          Properties:
+            Path: /generate-presigned-url
+            Method: post
+              
 
   ApplicationResourceGroup:
     Type: AWS::ResourceGroups::Group
@@ -101,3 +114,6 @@ Outputs:
   GenerateReportFunction:
     Description: "GenerateReport Lambda Function ARN"
     Value: !GetAtt GenerateReportFunction.Arn
+  GenerateReportFunctionAPI:
+    Description: "GenerateReport Lambda Function Invoke URL"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/generate-presigned-url/"

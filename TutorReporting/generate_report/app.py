@@ -5,7 +5,6 @@ from io import BytesIO
 import uuid
 import os
 
-
 s3 = boto3.client('s3')
 BUCKET_NAME = os.environ['GENERATEREPORTBUCKET_BUCKET_NAME']
 
@@ -77,7 +76,10 @@ def lambda_handler(event, context):
     # Upload the result back to S3
     s3.put_object(Bucket=BUCKET_NAME, Key=output_file_key, Body=output.getvalue(), ContentType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     
+    # Generate a presigned URL for the uploaded file, valid for 30 minutes
+    presigned_url = s3.generate_presigned_url('get_object', Params={'Bucket': BUCKET_NAME, 'Key': output_file_key}, ExpiresIn=1800)
+    
     return {
         'statusCode': 200,
-        'body': json.dumps(f"Report generated and uploaded to {output_file_key}")
+        'body': json.dumps({'message': f"Report generated and uploaded to {output_file_key}", 'presigned_url': presigned_url})
     }

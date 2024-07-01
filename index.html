@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h2 {
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="file"] {
+            display: block;
+            width: 100%;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Upload Report</h2>
+        <div class="form-group">
+            <label for="file">Choose a file:</label>
+            <input type="file" id="file" name="file">
+        </div>
+        <button onclick="uploadFile()">Upload</button>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        async function uploadFile() {
+            const fileInput = document.getElementById('file');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Please select a file to upload.');
+                return;
+            }
+
+            try {
+                // Make an API call to get the presigned URL
+                const response = await fetch('https://2n3t5bhkp7.execute-api.us-east-1.amazonaws.com/Prod/generate-presigned-url/');
+                const data = await response.json();
+                const presignedUrl = data.presigned_url;
+
+                // Upload the file using the presigned URL
+                const uploadResponse = await fetch(presignedUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': file.type
+                    },
+                    body: file
+                });
+
+                if (uploadResponse.ok) {
+                    document.getElementById('message').innerText = 'File uploaded successfully!';
+                } else {
+                    document.getElementById('message').innerText = 'Failed to upload file.';
+                }
+            } catch (error) {
+                console.error('Error uploading file:', error);
+                document.getElementById('message').innerText = 'Error uploading file.';
+            }
+        }
+    </script>
+</body>
+</html>
